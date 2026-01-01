@@ -1,0 +1,65 @@
+{
+  "name": "vue-apexsankey",
+  "version": "1.0.0",
+  "description": "Vue 3 wrapper for ApexSankey - A JavaScript library to create Sankey diagrams",
+  "type": "module",
+  "main": "./dist/vue-apexsankey.umd.cjs",
+  "module": "./dist/vue-apexsankey.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/vue-apexsankey.js"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/vue-apexsankey.umd.cjs"
+      }
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "vue-tsc --noEmit"
+  },
+  "peerDependencies": {
+    "apexsankey": ">=1.2.0",
+    "vue": ">=3.3.0",
+    "@svgdotjs/svg.js": ">=3.0.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.1",
+    "typescript": "~5.6.0",
+    "vite": "^6.0.0",
+    "vite-plugin-dts": "^4.3.0",
+    "vue": "^3.5.13",
+    "vue-tsc": "^2.2.0",
+    "apexsankey": "^1.2.5",
+    "@svgdotjs/svg.js": "^3.2.4"
+  },
+  "keywords": [
+    "vue",
+    "vue3",
+    "sankey",
+    "diagram",
+    "chart",
+    "visualization",
+    "apexsankey",
+    "svg"
+  ],
+  "author": "",
+  "license": "See LICENSE in LICENSE",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "bugs": {
+    "url": ""
+  },
+  "homepage": ""
+}

@@ -1,0 +1,17 @@
+# source
+src/
+
+# demo
+demo/
+
+# config files
+tsconfig.json
+vite.config.ts
+.gitignore
+.eslintrc*
+.prettierrc*
+
+# misc
+*.log
+.DS_Store
+coverage/
