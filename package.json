@@ -28,7 +28,7 @@
     "typecheck": "vue-tsc --noEmit"
   },
   "peerDependencies": {
-    "apexsankey": ">=1.2.0",
+    "apexsankey": ">=1.4.0",
     "vue": ">=3.3.0",
     "@svgdotjs/svg.js": ">=3.0.0"
   },
@@ -39,7 +39,7 @@
     "vite-plugin-dts": "^4.3.0",
     "vue": "^3.5.13",
     "vue-tsc": "^2.2.0",
-    "apexsankey": "^1.2.5",
+    "apexsankey": "^1.4.0",
     "@svgdotjs/svg.js": "^3.2.4"
   },
   "keywords": [
