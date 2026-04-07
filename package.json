@@ -56,10 +56,10 @@
   "license": "See LICENSE in LICENSE",
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/apexcharts/vue-apexsankey.git"
   },
   "bugs": {
-    "url": ""
+    "url": "https://github.com/apexcharts/vue-apexsankey/issues"
   },
-  "homepage": ""
+  "homepage": "https://github.com/apexcharts/vue-apexsankey#readme"
 }
