@@ -3,20 +3,18 @@ import { setApexSankeyLicense } from './utils/license'
 
 // re-export types
 export type {
-  Node,
-  Edge,
+  SankeyNode,
+  SankeyEdge,
   GraphData,
-  SankeyOptions,
-  CommonOptions,
-  NodeOptions,
-  EdgeOptions,
-  FontOptions,
-  TooltipOptions,
-  TooltipContent,
   DataOptions,
+  SankeyOptions,
+  TooltipContent,
+  SankeyGraph,
+  ApexSankeyInstance,
+  ApexSankeyConstructor,
   ApexSankeyProps,
+  ApexSankeyEmits,
   ApexSankeyRef,
-  SankeyGraph
 } from './types'
 
 // re-export composable
