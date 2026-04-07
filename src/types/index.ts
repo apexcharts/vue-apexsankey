@@ -1,195 +1,114 @@
 import type { CSSProperties } from 'vue'
 
+// ---------------------------------------------------------------------------
+// Core data types — kept here because vue-apexsankey loads ApexSankey via
+// the global window object (CDN pattern) and cannot import types from
+// 'apexsankey' at build time without it being a devDependency.
+// ---------------------------------------------------------------------------
+
 /**
  * node definition for sankey diagram
  */
-export interface Node {
-  /** unique identifier for the node */
+export interface SankeyNode {
   readonly id: string
-  /** display label for the node */
   readonly title: string
-  /** optional custom color for the node */
   readonly color?: string
 }
 
 /**
  * edge definition connecting two nodes
  */
-export interface Edge {
-  /** source node id */
+export interface SankeyEdge {
   readonly source: string
-  /** target node id */
   readonly target: string
-  /** edge weight/size */
   readonly value: number
-  /** optional grouping type */
   readonly type?: string
-  /** optional custom color for the edge */
   readonly color?: string
-}
-
-/**
- * common options for the sankey diagram
- */
-export interface CommonOptions {
-  /** css styles for canvas root container */
-  readonly canvasStyle?: string
-  /** enable/disable graph toolbar */
-  readonly enableToolbar?: boolean
-  /** height of graph container */
-  readonly height?: number | string
-  /** spacing from top and left of graph container */
-  readonly spacing?: number
-  /** viewport height */
-  readonly viewPortHeight?: number
-  /** viewport width */
-  readonly viewPortWidth?: number
-  /** width of graph container */
-  readonly width?: number | string
-}
-
-/**
- * node styling options
- */
-export interface NodeOptions {
-  /** border color of nodes */
-  readonly nodeBorderColor?: string
-  /** border width of nodes in pixels */
-  readonly nodeBorderWidth?: number
-  /** width of graph nodes */
-  readonly nodeWidth?: number
-  /** callback function for node click */
-  readonly onNodeClick?: (node: Node) => void
-}
-
-/**
- * edge styling options
- */
-export interface EdgeOptions {
-  /** enable gradient fill based on source and target node colors */
-  readonly edgeGradientFill?: boolean
-  /** opacity value for edges (0 to 1) */
-  readonly edgeOpacity?: number
-}
-
-/**
- * font styling options
- */
-export interface FontOptions {
-  /** font color of node labels */
-  readonly fontColor?: string
-  /** font family of node labels */
-  readonly fontFamily?: string
-  /** font size of node labels */
-  readonly fontSize?: string
-  /** font weight of node labels */
-  readonly fontWeight?: string
-}
-
-/**
- * tooltip configuration options
- */
-export interface TooltipOptions {
-  /** enable tooltip on hover */
-  readonly enableTooltip?: boolean
-  /** background color of tooltip */
-  readonly tooltipBGColor?: string
-  /** border color of tooltip */
-  readonly tooltipBorderColor?: string
-  /** tooltip html element id */
-  readonly tooltipId?: string
-  /** html template function for tooltip */
-  readonly tooltipTemplate?: (content: TooltipContent) => string
-}
-
-/**
- * content passed to tooltip template function
- */
-export interface TooltipContent {
-  source: Node
-  target: Node
-  value: number
 }
 
 /**
  * data options for custom ordering and link alignment
  */
 export interface DataOptions {
-  /** custom node ordering - list of layers, each containing bands of node ids */
   readonly order?: string[][][]
-  /** whether to align link types across nodes */
   readonly alignLinkTypes?: boolean
 }
 
 /**
- * complete sankey options combining all option interfaces
- */
-export type SankeyOptions = CommonOptions &
-  NodeOptions &
-  EdgeOptions &
-  FontOptions &
-  TooltipOptions
-
-/**
- * graph data structure containing nodes, edges, and optional configuration
+ * complete data structure for sankey diagram
  */
 export interface GraphData {
-  /** array of nodes */
-  readonly nodes: Node[]
-  /** array of edges connecting nodes */
-  readonly edges: Edge[]
-  /** optional data-level options */
+  readonly nodes: SankeyNode[]
+  readonly edges: SankeyEdge[]
   readonly options?: DataOptions
 }
 
 /**
- * props for the ApexSankey vue component
+ * content passed to tooltip template function
  */
-export interface ApexSankeyProps {
-  /** sankey diagram data (nodes and edges) */
-  data: GraphData
-  /** configuration options for the diagram */
-  options?: Partial<SankeyOptions>
-  /** css class name for the container element */
-  class?: string
-  /** inline styles for the container element */
-  style?: CSSProperties
+export interface TooltipContent {
+  source: SankeyNode
+  target: SankeyNode
+  value: number
 }
 
 /**
- * exposed ref interface for accessing the sankey instance
+ * combined sankey configuration options.
+ * Mirrors the SankeyOptions intersection type in core apexsankey.
+ * onNodeClick is intentionally omitted — use the @node-click emit instead.
  */
-export interface ApexSankeyRef {
-  /** the underlying SankeyGraph instance */
-  graph: SankeyGraph | null
-  /** the container html element */
-  element: HTMLElement | null
+export interface SankeyOptions {
+  // canvas / layout
+  readonly canvasStyle?: string
+  readonly enableToolbar?: boolean
+  readonly height?: number | string
+  readonly spacing?: number
+  readonly viewPortHeight?: number
+  readonly viewPortWidth?: number
+  readonly width?: number | string
+  // node
+  readonly nodeBorderColor?: string
+  readonly nodeBorderWidth?: number
+  readonly nodeWidth?: number
+  // edge
+  readonly edgeGradientFill?: boolean
+  readonly edgeOpacity?: number
+  readonly edgeGap?: number
+  // font
+  readonly fontColor?: string
+  readonly fontFamily?: string
+  readonly fontSize?: string
+  readonly fontWeight?: string
+  // tooltip
+  readonly enableTooltip?: boolean
+  readonly tooltipBGColor?: string
+  readonly tooltipBorderColor?: string
+  readonly tooltipId?: string
+  readonly tooltipTemplate?: (content: TooltipContent) => string
+  // interaction
+  readonly highlightOnHover?: boolean
+  readonly dimOnHover?: boolean
+  // animation
+  readonly enableAnimation?: boolean
+  readonly animationDuration?: number
 }
 
 /**
- * sankey graph instance returned by ApexSankey
+ * sankey graph instance returned by ApexSankey.render()
  */
 export interface SankeyGraph {
-  /** the graphlib graph instance */
   graph: unknown
-  /** maximum rank in the graph */
   maxRank: number
-  /** re-render the graph */
-  render: (options?: { keepOldPosition?: boolean }) => void
-  /** clear the canvas */
-  clear: () => void
-  /** export to svg */
-  exportToSvg: () => void
-  /** canvas height */
+  render(options?: { keepOldPosition?: boolean }): void
+  clear?: () => void
+  exportToSvg?: () => void
   height: number
-  /** canvas width */
   width: number
-  /** canvas spacing */
   spacing: number
 }
 
 /**
- * apexsankey constructor type
+ * apexsankey constructor type (loaded via window global)
  */
 export interface ApexSankeyConstructor {
   new (element: HTMLElement, options?: Partial<SankeyOptions>): ApexSankeyInstance
@@ -204,4 +123,31 @@ export interface ApexSankeyInstance {
   options: SankeyOptions
   graph: SankeyGraph
   render: (data: GraphData) => SankeyGraph
+  destroy: () => void
+}
+
+/**
+ * props for the ApexSankey Vue component.
+ * onNodeClick is omitted from options — use the @node-click emit instead.
+ */
+export interface ApexSankeyProps {
+  data: GraphData
+  options?: Omit<Partial<SankeyOptions>, 'onNodeClick'>
+  class?: string
+  style?: CSSProperties
+}
+
+/**
+ * emits for the ApexSankey Vue component
+ */
+export interface ApexSankeyEmits {
+  (e: 'nodeClick', node: SankeyNode): void
+}
+
+/**
+ * exposed ref interface
+ */
+export interface ApexSankeyRef {
+  graph: SankeyGraph | null
+  element: HTMLElement | null
 }
