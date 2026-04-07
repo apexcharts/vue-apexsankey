@@ -1,6 +1,6 @@
 {
   "name": "vue-apexsankey",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Vue 3 wrapper for ApexSankey - A JavaScript library to create Sankey diagrams",
   "type": "module",
   "main": "./dist/vue-apexsankey.umd.cjs",
@@ -28,7 +28,7 @@
     "typecheck": "vue-tsc --noEmit"
   },
   "peerDependencies": {
-    "apexsankey": ">=1.4.0",
+    "apexsankey": ">=1.7.0",
     "vue": ">=3.3.0",
     "@svgdotjs/svg.js": ">=3.0.0"
   },
