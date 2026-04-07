@@ -1,65 +1,20 @@
 # vue-apexsankey
 
-Vue 3 wrapper for [ApexSankey](https://github.com/apexcharts/apexsankey) - A JavaScript library to create Sankey diagrams.
+Vue 3 wrapper for [ApexSankey](https://github.com/apexcharts/apexsankey) — a JavaScript library for creating Sankey diagrams.
 
 ## Installation
 
 ```bash
-npm install vue-apexsankey apexsankey @svgdotjs/svg.js
+npm install vue-apexsankey apexsankey
 ```
 
-Or with yarn:
+> **Note:** `apexsankey` is a peer dependency and must be installed alongside `vue-apexsankey`.
 
-```bash
-yarn add vue-apexsankey apexsankey @svgdotjs/svg.js
-```
-
-Or with pnpm:
-
-```bash
-pnpm add vue-apexsankey apexsankey @svgdotjs/svg.js
-```
-
-## Loading ApexSankey
-
-**Important:** You must load ApexSankey before using the Vue component. Choose one of the following methods:
-
-### Option 1: ES Module Import (Recommended)
-
-Import ApexSankey at your app's entry point to register it globally:
-
-```ts
-// main.ts
-import "apexsankey";
-import { createApp } from "vue";
-import App from "./App.vue";
-
-createApp(App).mount("#app");
-```
-
-### Option 2: CDN Script Tags
-
-Add the scripts to your `index.html` before your app bundle:
-
-```html
-<!DOCTYPE html>
-<html>
-  <head>
-    <script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/apexsankey/apexsankey.min.js"></script>
-  </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.ts"></script>
-  </body>
-</html>
-```
-
-## Quick Start
+## Basic Usage
 
 ```vue
 <script setup lang="ts">
-import ApexSankey from "vue-apexsankey";
+import { ApexSankey } from "vue-apexsankey";
 import type { GraphData, SankeyOptions } from "vue-apexsankey";
 
 const data: GraphData = {
@@ -71,16 +26,16 @@ const data: GraphData = {
     { id: "energy", title: "Energy" },
   ],
   edges: [
-    { source: "oil", target: "fossil", value: 15 },
-    { source: "gas", target: "fossil", value: 20 },
-    { source: "coal", target: "fossil", value: 25 },
-    { source: "fossil", target: "energy", value: 60 },
+    { source: "oil", target: "fossil", value: 15, type: "flow" },
+    { source: "gas", target: "fossil", value: 20, type: "flow" },
+    { source: "coal", target: "fossil", value: 25, type: "flow" },
+    { source: "fossil", target: "energy", value: 60, type: "flow" },
   ],
 };
 
 const options: Partial<SankeyOptions> = {
   width: 800,
-  height: 600,
+  height: 500,
   nodeWidth: 20,
 };
 </script>
@@ -92,16 +47,14 @@ const options: Partial<SankeyOptions> = {
 
 ## License Setup
 
-If you have a commercial license, set it once at app initialization before rendering any charts:
+If you have a commercial license, set it once at app initialization:
 
 ```ts
 // main.ts
-import "apexsankey";
 import { createApp } from "vue";
 import { setApexSankeyLicense } from "vue-apexsankey";
 import App from "./App.vue";
 
-// set license before mounting app
 setApexSankeyLicense("your-license-key-here");
 
 createApp(App).mount("#app");
@@ -109,45 +62,34 @@ createApp(App).mount("#app");
 
 ## Using Template Refs
 
-Access the underlying `SankeyGraph` instance via template refs:
-
 ```vue
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import ApexSankey from "vue-apexsankey";
-import type { GraphData } from "vue-apexsankey";
+import { ApexSankey } from "vue-apexsankey";
+import type { ApexSankeyRef } from "vue-apexsankey";
 
-const chartRef = ref<InstanceType<typeof ApexSankey> | null>(null);
-
-const data: GraphData = {
-  nodes: [
-    { id: "a", title: "A" },
-    { id: "b", title: "B" },
-  ],
-  edges: [{ source: "a", target: "b", value: 10 }],
-};
+const chartRef = ref<ApexSankeyRef | null>(null);
 
 onMounted(() => {
   if (chartRef.value?.graph) {
-    console.log("Graph instance:", chartRef.value.graph);
     console.log("Max rank:", chartRef.value.graph.maxRank);
   }
 });
 </script>
 
 <template>
-  <ApexSankey ref="chartRef" :data="data" />
+  <ApexSankey ref="chartRef" :data="data" :options="options" />
 </template>
 ```
 
 ## Reactivity
 
-The component automatically updates when props change:
+The component re-renders automatically when `data` or `options` change:
 
 ```vue
 <script setup lang="ts">
 import { ref } from "vue";
-import ApexSankey from "vue-apexsankey";
+import { ApexSankey } from "vue-apexsankey";
 import type { GraphData, SankeyOptions } from "vue-apexsankey";
 
 const data = ref<GraphData>({
@@ -155,146 +97,124 @@ const data = ref<GraphData>({
     { id: "a", title: "A" },
     { id: "b", title: "B" },
   ],
-  edges: [{ source: "a", target: "b", value: 10 }],
+  edges: [{ source: "a", target: "b", value: 10, type: "flow" }],
 });
 
-const options = ref<Partial<SankeyOptions>>({
-  nodeWidth: 20,
-});
-
-function updateData() {
-  // chart will automatically re-render
-  data.value = {
-    ...data.value,
-    edges: [{ source: "a", target: "b", value: 50 }],
-  };
-}
-
-function updateOptions() {
-  // chart will recreate with new options
-  options.value = {
-    ...options.value,
-    nodeWidth: 30,
-  };
-}
+const options = ref<Partial<SankeyOptions>>({ nodeWidth: 20 });
 </script>
 
 <template>
-  <div>
-    <ApexSankey :data="data" :options="options" />
-    <button @click="updateData">Update Data</button>
-    <button @click="updateOptions">Update Options</button>
-  </div>
+  <ApexSankey :data="data" :options="options" />
 </template>
 ```
 
 ## Props
 
-| Prop      | Type                     | Required | Description                           |
-| --------- | ------------------------ | -------- | ------------------------------------- |
-| `data`    | `GraphData`              | Yes      | Sankey diagram data (nodes and edges) |
-| `options` | `Partial<SankeyOptions>` | No       | Configuration options for the diagram |
+| Prop      | Type                     | Default      | Description                       |
+| --------- | ------------------------ | ------------ | --------------------------------- |
+| `data`    | `GraphData`              | **required** | Sankey data (nodes and edges)     |
+| `options` | `Partial<SankeyOptions>` | -            | Sankey configuration (see below)  |
 
-## Data Format
+### SankeyOptions
 
-### Nodes
+All Sankey configuration is passed through the `options` prop. `SankeyOptions` is an intersection of the sub-interfaces below — pass a partial; any omitted field falls back to its default.
 
-```typescript
-interface Node {
-  id: string; // unique identifier
-  title: string; // display label
-  color?: string; // optional custom color
-}
-```
+#### Canvas & layout
 
-### Edges
+| Option           | Type               | Default  | Description                                                         |
+| ---------------- | ------------------ | -------- | ------------------------------------------------------------------- |
+| `width`          | `number \| string` | `'100%'` | Canvas width (pixel number or CSS percentage)                       |
+| `height`         | `number \| string` | `'auto'` | Canvas height. `'auto'` derives from width at 1.6:1                 |
+| `spacing`        | `number`           | `20`     | Horizontal spacing between node columns in pixels                   |
+| `viewPortWidth`  | `number`           | `800`    | Internal SVG viewport width                                         |
+| `viewPortHeight` | `number`           | `500`    | Internal SVG viewport height                                        |
+| `whitespace`     | `number`           | `0.18`   | Fraction of vertical space used as margins between nodes (0–1)      |
+| `canvasStyle`    | `string`           | `''`     | Arbitrary CSS injected onto the SVG root container                  |
+| `enableToolbar`  | `boolean`          | `true`   | Show the zoom/pan/export toolbar                                    |
 
-```typescript
-interface Edge {
-  source: string; // source node id
-  target: string; // target node id
-  value: number; // edge weight/size
-  type?: string; // optional grouping type
-  color?: string; // optional custom color
-}
-```
+#### Nodes
 
-### Complete Data Structure
+| Option            | Type                              | Default | Description                                                |
+| ----------------- | --------------------------------- | ------- | ---------------------------------------------------------- |
+| `nodeWidth`       | `number`                          | `20`    | Width of each node rectangle in pixels                     |
+| `nodeBorderWidth` | `number`                          | `1`     | Border width of each node in pixels                        |
+| `nodeBorderColor` | `string \| null`                  | `null`  | Node border color                                          |
+| `onNodeClick`     | `(node: SankeyNode) => void`      | -       | Callback fired when a node is clicked                      |
 
-```typescript
+#### Edges
+
+| Option             | Type      | Default | Description                                                     |
+| ------------------ | --------- | ------- | --------------------------------------------------------------- |
+| `edgeOpacity`      | `number`  | `0.4`   | Opacity of edges (0–1)                                          |
+| `edgeGradientFill` | `boolean` | `true`  | Fill edges with a gradient between source and target colors    |
+| `edgeGap`          | `number`  | `2`     | Gap in pixels between adjacent edges at their connection points |
+
+#### Font
+
+| Option       | Type     | Default     | Description                      |
+| ------------ | -------- | ----------- | -------------------------------- |
+| `fontSize`   | `string` | `'14px'`    | CSS font-size for node labels    |
+| `fontFamily` | `string` | `''`        | CSS font-family for node labels  |
+| `fontWeight` | `string` | `'400'`     | CSS font-weight for node labels  |
+| `fontColor`  | `string` | `'#212121'` | CSS color for node labels        |
+
+#### Tooltip
+
+| Option                | Type                                          | Default                          | Description                                  |
+| --------------------- | --------------------------------------------- | -------------------------------- | -------------------------------------------- |
+| `enableTooltip`       | `boolean`                                     | `true`                           | Show edge tooltips on hover                  |
+| `tooltipTheme`        | `'light' \| 'dark'`                           | -                                | Shortcut for dark/light color presets        |
+| `tooltipBGColor`      | `string`                                      | `'#FFFFFF'`                      | Tooltip background color                     |
+| `tooltipBorderColor`  | `string`                                      | `'#E2E8F0'`                      | Tooltip border color                         |
+| `tooltipFontColor`    | `string`                                      | `'#1a1a1a'`                      | Tooltip font color                           |
+| `tooltipId`           | `string`                                      | `'apexsankey-tooltip-container'` | HTML `id` for the tooltip container          |
+| `tooltipTemplate`     | `(content: TooltipContent) => string`         | -                                | Custom edge (source→target) tooltip HTML     |
+| `nodeTooltipTemplate` | `(content: NodeTooltipContent) => string`     | -                                | Custom per-node tooltip HTML                 |
+
+#### Interaction & animation
+
+| Option                   | Type      | Default | Description                                                    |
+| ------------------------ | --------- | ------- | -------------------------------------------------------------- |
+| `highlightConnectedPath` | `boolean` | `true`  | Highlight the connected flow path on hover                     |
+| `dimOpacity`             | `number`  | `0.15`  | Opacity for dimmed (unrelated) elements during highlighting    |
+| `animation.enabled`      | `boolean` | `true`  | Play entrance animation (disabled if `prefers-reduced-motion`) |
+| `animation.duration`     | `number`  | `800`   | Entrance animation duration in ms                              |
+
+#### Accessibility
+
+| Option               | Type      | Default | Description                                                  |
+| -------------------- | --------- | ------- | ------------------------------------------------------------ |
+| `a11y.enabled`       | `boolean` | `true`  | Enable WCAG 2.1 AA accessibility features                    |
+| `a11y.diagramLabel`  | `string`  | -       | Override the auto-generated aria-label on the SVG root       |
+| `a11y.description`   | `string`  | -       | Populates the `<desc>` element for a longer description      |
+
+## Data Structure
+
+```ts
 interface GraphData {
-  nodes: Node[];
-  edges: Edge[];
-  options?: {
-    order?: string[][][]; // custom node ordering
-    alignLinkTypes?: boolean; // align links by type
-  };
+  nodes: SankeyGraphNode[];
+  edges: SankeyGraphEdge[];
 }
-```
 
-## Options
+interface SankeyGraphNode {
+  id: string;       // unique identifier
+  title: string;    // display label
+  color?: string;   // override auto-assigned palette color
+}
 
-| Option               | Type                   | Default                      | Description                                  |
-| -------------------- | ---------------------- | ---------------------------- | -------------------------------------------- |
-| `width`              | `number \| string`     | `800`                        | Width of graph container                     |
-| `height`             | `number \| string`     | `800`                        | Height of graph container                    |
-| `canvasStyle`        | `string`               | `""`                         | CSS styles for canvas root container         |
-| `spacing`            | `number`               | `100`                        | Spacing from top and left of graph container |
-| `nodeWidth`          | `number`               | `20`                         | Width of graph nodes                         |
-| `nodeBorderWidth`    | `number`               | `1`                          | Border width of nodes in pixels              |
-| `nodeBorderColor`    | `string`               | `""`                         | Border color of nodes                        |
-| `onNodeClick`        | `(node: Node) => void` | `undefined`                  | Callback function for node click             |
-| `edgeOpacity`        | `number`               | `0.4`                        | Opacity value for edges (0 to 1)             |
-| `edgeGradientFill`   | `boolean`              | `true`                       | Enable gradient fill based on node colors    |
-| `enableTooltip`      | `boolean`              | `false`                      | Enable tooltip on hover                      |
-| `enableToolbar`      | `boolean`              | `false`                      | Enable/disable graph toolbar                 |
-| `tooltipId`          | `string`               | `"sankey-tooltip-container"` | Tooltip HTML element id                      |
-| `tooltipTemplate`    | `(content) => string`  | default template             | HTML template for tooltip                    |
-| `tooltipBorderColor` | `string`               | `"#BCBCBC"`                  | Border color of tooltip                      |
-| `tooltipBGColor`     | `string`               | `"#FFFFFF"`                  | Background color of tooltip                  |
-| `fontSize`           | `string`               | `"14px"`                     | Font size of node labels                     |
-| `fontFamily`         | `string`               | `""`                         | Font family of node labels                   |
-| `fontWeight`         | `string`               | `"400"`                      | Font weight of node labels                   |
-| `fontColor`          | `string`               | `"#000000"`                  | Font color of node labels                    |
-
-## Custom Node Ordering
-
-You can specify custom node ordering using the `order` option in data:
-
-```vue
-<script setup lang="ts">
-import ApexSankey from "vue-apexsankey";
-import type { GraphData } from "vue-apexsankey";
-
-const data: GraphData = {
-  nodes: [
-    { id: "a", title: "A" },
-    { id: "b", title: "B" },
-    { id: "c", title: "C" },
-  ],
-  edges: [
-    { source: "a", target: "c", value: 1 },
-    { source: "b", target: "c", value: 2 },
-  ],
-  options: {
-    order: [
-      [["a", "b"]], // first layer
-      [["c"]], // second layer
-    ],
-  },
-};
-</script>
-
-<template>
-  <ApexSankey :data="data" />
-</template>
+interface SankeyGraphEdge {
+  source: string;   // id of upstream node
+  target: string;   // id of downstream node
+  value: number;    // flow value — determines edge band width
+  type: string;     // category label (used for grouping and tooltip)
+}
 ```
 
 ## Custom Tooltip
 
 ```vue
 <script setup lang="ts">
-import ApexSankey from "vue-apexsankey";
+import { ApexSankey } from "vue-apexsankey";
 import type { GraphData, SankeyOptions } from "vue-apexsankey";
 
 const data: GraphData = {
@@ -302,14 +222,14 @@ const data: GraphData = {
     { id: "a", title: "A" },
     { id: "b", title: "B" },
   ],
-  edges: [{ source: "a", target: "b", value: 10 }],
+  edges: [{ source: "a", target: "b", value: 10, type: "flow" }],
 };
 
 const options: Partial<SankeyOptions> = {
   enableTooltip: true,
   tooltipTemplate: ({ source, target, value }) => `
     <div style="padding: 8px;">
-      <strong>${source.title}</strong> → <strong>${target.title}</strong>
+      <strong>${source?.title}</strong> → <strong>${target?.title}</strong>
       <br />
       Value: ${value}
     </div>
@@ -324,7 +244,7 @@ const options: Partial<SankeyOptions> = {
 
 ## Using the Composable
 
-For more control, you can use the `useSankey` composable directly:
+For more control, use the `useSankey` composable directly:
 
 ```vue
 <script setup lang="ts">
@@ -339,12 +259,10 @@ const data = ref<GraphData>({
     { id: "a", title: "A" },
     { id: "b", title: "B" },
   ],
-  edges: [{ source: "a", target: "b", value: 10 }],
+  edges: [{ source: "a", target: "b", value: 10, type: "flow" }],
 });
 
-const options = ref<Partial<SankeyOptions>>({
-  nodeWidth: 20,
-});
+const options = ref<Partial<SankeyOptions>>({ nodeWidth: 20 });
 
 const { graph, isReady, render, destroy, recreate } = useSankey({
   containerRef,
@@ -354,26 +272,23 @@ const { graph, isReady, render, destroy, recreate } = useSankey({
 </script>
 
 <template>
-  <div ref="containerRef" style="width: 800px; height: 600px;" />
+  <div ref="containerRef" style="width: 800px; height: 500px;" />
 </template>
 ```
 
-## TypeScript
-
-All types are exported for use in your TypeScript projects:
+## TypeScript Support
 
 ```ts
-import ApexSankey, {
+import type {
+  ApexSankeyProps,
+  ApexSankeyRef,
   GraphData,
-  Node,
-  Edge,
+  SankeyGraphNode,
+  SankeyGraphEdge,
   SankeyOptions,
-  CommonOptions,
-  NodeOptions,
-  EdgeOptions,
-  FontOptions,
-  TooltipOptions,
-  SankeyGraph,
+  SankeyNode,
+  TooltipContent,
+  NodeTooltipContent,
 } from "vue-apexsankey";
 ```
 
@@ -381,15 +296,15 @@ import ApexSankey, {
 
 This component is SSR-safe. It renders an empty container on the server and only initializes the chart client-side after the component is mounted.
 
-## Browser Support
-
-- Vue 3.3+
-- Modern browsers (Chrome, Firefox, Safari, Edge)
-
 ## License
 
-See [LICENSE](./LICENSE) file for details.
+vue-apexsankey uses the same dual-license model as ApexCharts. See [LICENSE](./LICENSE) for details.
+
+- **Free** for individuals, non-profits, and small businesses (< $2M revenue)
+- **Commercial license** required for larger organizations
 
 ## Links
 
-- [ApexSankey GitHub](https://github.com/apexcharts/apexsankey)
+- [ApexSankey Documentation](https://github.com/apexcharts/apexsankey)
+- [ApexCharts](https://apexcharts.com)
+- [License Information](https://apexcharts.com/license)
