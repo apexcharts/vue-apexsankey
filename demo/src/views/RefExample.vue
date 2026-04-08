@@ -60,7 +60,7 @@ function manualRender() {
 }
 
 function exportSvg() {
-  chartRef.value?.graph?.exportToSvg()
+  chartRef.value?.graph?.exportToSvg?.()
 }
 </script>
 
