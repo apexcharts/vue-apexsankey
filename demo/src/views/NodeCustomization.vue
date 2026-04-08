@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import ApexSankey from 'vue-apexsankey'
-import type { GraphData, SankeyOptions, Node } from 'vue-apexsankey'
+import type { GraphData, SankeyOptions, SankeyNode } from 'vue-apexsankey'
 
 const data: GraphData = {
   nodes: [
@@ -25,7 +25,7 @@ const data: GraphData = {
   ]
 }
 
-const clickedNode = ref<Node | null>(null)
+const clickedNode = ref<SankeyNode | null>(null)
 
 const options = ref<Partial<SankeyOptions>>({
   width: '90%',
@@ -36,10 +36,11 @@ const options = ref<Partial<SankeyOptions>>({
   nodeBorderWidth: 2,
   nodeBorderColor: '#111',
   edgeGradientFill: false,
-  onNodeClick: (node: Node) => {
-    clickedNode.value = node
-  }
 })
+
+const handleNodeClick = (node: SankeyNode) => {
+  clickedNode.value = node
+}
 </script>
 
 <template>
@@ -57,7 +58,7 @@ const options = ref<Partial<SankeyOptions>>({
     </div>
     
     <div class="chart-container">
-      <ApexSankey :data="data" :options="options" />
+      <ApexSankey :data="data" :options="options" @node-click="handleNodeClick" />
     </div>
 
     <div class="code-section">
@@ -67,10 +68,10 @@ const options = ref<Partial<SankeyOptions>>({
   nodeBorderWidth: 2,
   nodeBorderColor: '#111',
   edgeGradientFill: false,
-  onNodeClick: (node: Node) => {
-    console.log('Clicked:', node)
-  }
-}</code></pre>
+}
+
+// in template:
+// &lt;ApexSankey :data="data" :options="options" @node-click="handleNodeClick" /&gt;</code></pre>
     </div>
   </div>
 </template>
